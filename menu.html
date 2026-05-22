@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Kardex Pro Mejorado + Voz</title>
+<style>
+
+/* LOGIN */
+
+.login-box{
+  width:300px;
+  background:white;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 0 15px rgba(0,0,0,0.2);
+
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+
+  text-align:center;
+}
+
+.login-box input{
+  width:90%;
+  margin:10px 0;
+  padding:12px;
+}
+
+.login-box button{
+  width:100%;
+  padding:12px;
+}
+body { font-family: Arial; padding: 20px; background:#f5f5f5;}
+table { border-collapse: collapse; width: 100%; margin-bottom: 20px; background:white;}
+th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+th { background:#eee; }
+input, select, button { padding: 8px; margin: 5px; }
+button { cursor:pointer; }
+
+/* BOTÓN 3 LÍNEAS */
+.menu-btn{
+  font-size:30px;
+  padding:15px;
+  cursor:pointer;
+  background:#222;
+  color:white;
+  width:50px;
+  text-align:center;
+
+  position:fixed;
+  top:10px;
+  left:10px;
+  z-index:1000;
+  border-radius:10px;
+}
+/* PANEL */
+.sidebar{
+  width:250px;
+  height:100vh;
+  background:#2c3e50;
+  position:fixed;
+  left:-250px;
+  top:0;
+  transition:0.3s;
+  padding-top:20px;
+  z-index:999;
+}
+
+.sidebar.active{
+  left:0;
+}
+
+.sidebar h2{
+  color:white;
+  text-align:center;
+}
+
+.sidebar a{
+  display:block;
+  color:white;
+  padding:15px;
+  text-decoration:none;
+}
+
+.sidebar a:hover{
+  background:#34495e;
+}
+.cards{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  width:200px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+  text-align:center;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.card h2{
+  font-size:35px;
+  color:#3498db;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="login-box">
+
+  <h2>Iniciar Sesión</h2>
+
+  <input type="text" id="usuario" placeholder="Usuario">
+
+  <input type="password" id="clave" placeholder="Contraseña">
+
+  <button onclick="iniciarSesion()">Entrar</button>
+
+  <button onclick="registrarUsuario()">Registrarse</button>
+
+</div> <!-- 🔴 CIERRE DEL LOGIN -->
+
+<!-- SISTEMA -->
+<div id="sistema" style="display:none;">
+
+<!-- BOTÓN -->
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+<!-- MENÚ -->
+<div class="sidebar" id="sidebar">
+  <h2>Mi Sistema</h2>
+
+  <a href="#" onclick="mostrarPanel('inicioPanel')">🏠 Inicio</a>
+<a href="#" onclick="mostrarPanel('kardexPanel')">📦 Kardex</a>
+<a href="#" onclick="mostrarPanel('estadisticaPanel')">📊 Estadística</a>
+<a href="#" onclick="mostrarPanel('finanzasPanel')">💰 Finanzas</a>
+</div>
+
+<!-- PANELES -->
+
+
+  <div id="inicioPanel" class="panel">
+
+<h1>📊 Dashboard ANEXUS</h1>
+
+<div class="cards">
+
+  <div class="card">
+    <h2 id="totalProductos">0</h2>
+    <p>📦 Productos</p>
+  </div>
+
+  <div class="card">
+    <h2 id="totalStock">0</h2>
+    <p>📚 Stock Total</p>
+  </div>
+
+  <div class="card">
+    <h2 id="totalIngresos">$0</h2>
+    <p>💰 Ingresos</p>
+  </div>
+
+  <div class="card">
+    <h2 id="totalEgresos">$0</h2>
+    <p>🛒 Egresos</p>
+  </div>
+
+</div>
+
+</div>
+
+<div id="estadisticaPanel" class="panel" style="display:none;">
+  <h2>📊 Gráfica Estadística</h2>
+
+  <canvas id="miGrafica" width="400" height="200"></canvas>
+
+</div> <!-- 👈 ESTA LÍNEA ES LA CLAVE -->
+
+<div id="finanzasPanel" class="panel" style="display:none;">
+  <h2>💰 Finanzas</h2>
+
+  <div class="cards">
+
+    <div class="card">
+      <h2 id="fIngresos">$0</h2>
+      <p>💰 Ingresos</p>
+    </div>
+
+    <div class="card">
+      <h2 id="fEgresos">$0</h2>
+      <p>🛒 Egresos</p>
+    </div>
+
+    <div class="card">
+      <h2 id="fGanancia">$0</h2>
+      <p>📈 Ganancia</p>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="ayudaPanel" class="panel" style="display:none;">
+  <h2>❓ Ayuda</h2>
+</div>
+
+<!-- 🔥 TODO EL SISTEMA VA DESPUÉS -->
+<div id="kardexPanel" class="panel" style="display:none;">
+<h1> Sistema Kardex PRO+ (con Voz)</h1>
+<h2>📦 Productos</h2>
+<input type="text" id="buscadorProducto" placeholder="Buscar producto..." onkeyup="buscarProductos()">
+<table id="tablaProductos">
+<thead><tr><th>Código</th><th>Nombre</th><th>IVA</th><th>Stock</th><th>Acción</th></tr></thead>
+<tbody></tbody>
+</table>
+
+<input id="codigo" placeholder="Código">
+<input id="nombre" placeholder="Nombre">
+<select id="ivaProducto">
+<option value="0">No IVA</option>
+<option value="1">Sí IVA</option>
+</select>
+<button onclick="agregarProducto()">Agregar</button>
+
+<hr>
+
+<h2>🛒 Registrar Operación</h2>
+<input id="codMov" placeholder="Código">
+<select id="tipoOperacion">
+<option value="Compra">Compra</option>
+<option value="Venta">Venta</option>
+<option value="DevCompra">Devolución Compra</option>
+<option value="DevVenta">Devolución Venta</option>
+</select>
+<input id="cantidad" type="number" placeholder="Cantidad">
+<input id="precioInput" type="number" placeholder="Precio Unitario">
+<button onclick="registrarOperacion()">Registrar</button>
+<button onclick="iniciarVoz()">🎤 Hablar</button>
+
+<h3>📋 Kardex</h3>
+<table id="tablaKardex">
+<thead>
+<tr>
+<th>Código</th><th>Tipo</th>
+<th>Entrada Cant.</th><th>Entrada V/U</th><th>Entrada Total</th>
+<th>Salida Cant.</th><th>Salida V/U</th><th>Salida Total</th>
+<th>Saldo Cant.</th><th>Saldo V/U</th><th>Saldo Total</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<hr>
+
+<h2>💰 Finanzas</h2>
+<h3>🟢 Ingresos</h3>
+<table id="tablaIngresos">
+<thead><tr><th>Detalle</th><th>Base</th><th>IVA</th><th>Total</th></tr></thead>
+<tbody></tbody>
+</table>
+
+<h3>🔴 Egresos</h3>
+<table id="tablaEgresos">
+<thead><tr><th>Detalle</th><th>Base</th><th>IVA</th><th>Total</th></tr></thead>
+<tbody></tbody>
+</table>
+
+<h3>📊 Totales</h3>
+<p>Base: <span id="baseTotal">0</span></p>
+<p>IVA: <span id="ivaTotal">0</span></p>
+<p>Total: <span id="totalGeneral">0</span></p>
+</div>
+
+<script>
+
+
+// crear admin por defecto
+if(!localStorage.getItem("usuarios")){
+
+  let admin = [
+    {
+      usuario: "admin",
+      clave: "1234"
+    }
+  ];
+
+  localStorage.setItem("usuarios", JSON.stringify(admin));
+}
+
+// ocultar sistema al inicio
+
+function iniciarSesion(){
+
+  let usuario = document.getElementById("usuario").value;
+  let clave = document.getElementById("clave").value;
+
+  let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+  let encontrado = usuarios.find(
+    u => u.usuario === usuario && u.clave === clave
+  );
+
+  if(encontrado){
+
+    document.getElementById("login").style.display = "none";
+
+    document.getElementById("sistema").style.display = "block";
+    mostrarPanel("inicioPanel");
+
+    hablar("Bienvenido " + usuario);
+
+  }else{
+
+    alert("Usuario o contraseña incorrectos");
+
+  }
+}
+
+function registrarUsuario(){
+
+  let usuario = document.getElementById("usuario").value;
+  let clave = document.getElementById("clave").value;
+
+  if(usuario === "" || clave === ""){
+    alert("Completa todos los campos");
+    return;
+  }
+
+  let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+  let existe = usuarios.find(u => u.usuario === usuario);
+
+  if(existe){
+    alert("Ese usuario ya existe");
+    return;
+  }
+
+  usuarios.push({
+    usuario: usuario,
+    clave: clave
+  });
+
+  localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
+  alert("Usuario registrado correctamente");
+}
+
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+function mostrarPanel(id){
+
+  let paneles = document.querySelectorAll(".panel");
+
+  paneles.forEach(panel=>{
+    panel.style.display = "none";
+  });
+
+  let panel = document.getElementById(id);
+
+  if(panel){
+    panel.style.display = "block";
+  }
+
+  document.getElementById("sidebar").classList.remove("active");
+}
+
+let productos = JSON.parse(localStorage.getItem("productos")) || [];
+let kardex = JSON.parse(localStorage.getItem("kardex")) || [];
+let finanzas = JSON.parse(localStorage.getItem("finanzas")) || [];
+window.recalculando = false;
+function guardar(){
+  localStorage.setItem("productos", JSON.stringify(productos));
+  localStorage.setItem("kardex", JSON.stringify(kardex));
+  localStorage.setItem("finanzas", JSON.stringify(finanzas));
+}
+
+function agregarProducto(){
+  let c = codigo.value.trim();
+  let n = nombre.value.trim();
+  let iva = ivaProducto.value == "1";
+
+  if(!c || !n) return alert("Completa datos");
+  if(productos.find(p=>p.codigo===c)) return alert("Código ya existe");
+
+  productos.push({codigo:c,nombre:n,stock:0,valorTotal:0,iva});
+  guardar(); renderTodo();
+  
+}
+
+function eliminarProducto(i){
+  productos.splice(i,1);
+  guardar(); renderTodo();
+}
+
+function registrarOperacion(){
+  if(window.recalculando) return;
+  let cod = codMov.value.trim();
+  let tipo = tipoOperacion.value;
+  let cant = parseInt(cantidad.value);
+  let precio = parseFloat(precioInput.value);
+
+  if(!cod || isNaN(cant) || isNaN(precio)) return alert("Error");
+
+  let p = productos.find(x=>x.codigo===cod);
+  if(!p) return alert("No existe");
+
+  let entradaCant=0, entradaVU=0, entradaTotal=0;
+  let salidaCant=0, salidaVU=0, salidaTotal=0;
+
+ let base = cant * precio;
+let iva = 0;
+
+if(p.iva){
+  iva = base * 0.15;
+}
+
+let total = base + iva;
+  if(tipo==="Compra"){
+    p.stock += cant;
+    p.valorTotal += base;
+
+    entradaCant=cant; entradaVU=precio; entradaTotal=base;
+    finanzas.push({
+  detalle: "Compra",
+  tipo: "Egreso",
+  base,
+  iva,
+  total
+});
+  }
+
+  else if(tipo==="Venta"){
+  if(p.stock < cant) return alert("Sin stock");
+
+  let costoProm = p.stock > 0 ? (p.valorTotal / p.stock) : 0;
+  let costoVenta = costoProm * cant;
+
+  p.stock -= cant;
+  p.valorTotal -= costoVenta;
+
+  salidaCant = cant;
+  salidaVU = costoProm;
+  salidaTotal = costoVenta;
+
+  finanzas.push({
+  detalle: "Venta",
+  tipo: "Ingreso",
+  base: total,   // SOLO ingreso real con IVA incluido
+  iva,
+  total
+});
+}
+
+
+  else if(tipo==="DevVenta"){
+    p.stock += cant;
+    p.valorTotal += base;
+
+    entradaCant=cant; entradaVU=precio; entradaTotal=base;
+    finanzas.push({
+  detalle: "Devolución Venta",
+  tipo: "Ingreso",
+  base,
+  iva,
+  total
+});
+  }
+
+  let saldoVU = p.stock>0 ? (p.valorTotal/p.stock) : 0;
+
+  kardex.push({
+  codigo:cod,
+  tipo,
+
+  // 🔥 datos originales (CLAVE)
+  cantidad:cant,
+  precio:precio,
+
+  entradaCant,entradaVU,entradaTotal,
+  salidaCant,salidaVU,salidaTotal,
+
+  saldoCant:p.stock,
+  saldoVU,
+  saldoTotal:p.valorTotal
+});
+
+ if(!window.recalculando){
+  hablar("Operación registrada");
+}
+  guardar(); renderTodo();
+}
+
+// 🎤 VOZ MEJORADA
+function iniciarVoz(){
+
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+    alert("Tu navegador no soporta reconocimiento de voz");
+    return;
+  }
+
+  const reconocimiento = new SpeechRecognition();
+
+
+
+  reconocimiento.lang = "es-ES";
+  reconocimiento.continuous = false;
+  reconocimiento.interimResults = false;
+
+  reconocimiento.start();
+
+  reconocimiento.onstart = function(){
+    console.log("Micrófono activado");
+    hablar("Te escucho");
+  };
+
+  reconocimiento.onresult = function(event){
+
+    let texto = event.results[0][0].transcript.toLowerCase();
+
+    console.log("Texto:", texto);
+
+    procesarVoz(texto);
+  };
+
+  reconocimiento.onerror = function(event){
+
+  console.log("Error:", event.error);
+
+  if(event.error === "network"){
+    console.log("Error de red, reintentando...");
+
+    // 🔥 vuelve a intentar automáticamente
+    setTimeout(()=>{
+      reconocimiento.start();
+    }, 1000);
+  }else{
+    alert("Error de voz: " + event.error);
+  }
+};
+
+}
+
+// 🔥 PROCESAR VOZ
+function procesarVoz(texto){
+
+  console.log("Texto detectado:", texto);
+
+  // quitar tildes
+  texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+  let tipo = "";
+
+  if(texto.includes("compra")) tipo = "Compra";
+  else if(texto.includes("venta")) tipo = "Venta";
+  else if(texto.includes("devolucion compra")) tipo = "DevCompra";
+  else if(texto.includes("devolucion venta")) tipo = "DevVenta";
+
+  // detectar datos
+  let codigoMatch = texto.match(/cod\w*\s*(\w+)/);
+
+  let cantidadMatch = texto.match(/cant\w*\s*(\d+)/);
+
+  // ✅ acepta decimales
+  let precioMatch = texto.match(/prec\w*\s*(\d+(\.\d+)?)/);
+
+  if(!codigoMatch || !cantidadMatch || !precioMatch){
+
+    hablar("No entendí bien, intenta otra vez");
+
+    console.log({
+      codigo: codigoMatch,
+      cantidad: cantidadMatch,
+      precio: precioMatch
+    });
+
+    return;
+  }
+
+  // llenar inputs automáticamente
+  codMov.value = codigoMatch[1].toUpperCase();
+
+  tipoOperacion.value = tipo;
+
+  cantidad.value = cantidadMatch[1];
+
+  precioInput.value = precioMatch[1];
+
+
+// VALIDAR antes de registrar
+let cant = parseInt(cantidad.value);
+let precio = parseFloat(precioInput.value);
+
+if(isNaN(cant) || isNaN(precio)){
+  return alert("Error en datos");
+}
+
+if(cant <= 0 || precio <= 0){
+  return alert("Cantidad y precio deben ser mayores a 0");
+}
+
+hablar("Registrando operación");
+
+registrarOperacion();
+
+// limpiar inputs
+codMov.value = "";
+cantidad.value = "";
+precioInput.value = "";
+}
+// 🔊 RESPUESTA POR VOZ
+function hablar(texto){
+  let msg = new SpeechSynthesisUtterance(texto);
+  msg.lang = "es-ES";
+  speechSynthesis.speak(msg);
+}
+
+function eliminarMovimiento(i){
+  if(confirm("¿Seguro que quieres eliminar este movimiento?")){
+    kardex.splice(i,1);
+
+    guardar();          // 🔥 guarda primero
+    recalcularTodo();   // 🔥 luego recalcula
+  }
+}
+function recalcularTodo(){
+
+  // 🔥 activar modo silencioso
+  window.recalculando = true;
+
+  productos.forEach(p=>{
+    p.stock = 0;
+    p.valorTotal = 0;
+  });
+
+  let copia = [...kardex];
+
+  kardex = [];
+  finanzas = [];
+
+ copia.forEach(k=>{
+  registrarOperacionSilencioso(k);
+});
+
+  // limpiar inputs
+  codMov.value = "";
+  cantidad.value = "";
+  precioInput.value = "";
+
+  // 🔥 desactivar modo silencioso
+  window.recalculando = false;
+
+  guardar();
+  renderTodo();
+}
+function buscarProductos(){
+
+  let filtro = document.getElementById("buscadorProducto").value.toLowerCase();
+
+  let filas = tablaProductos.querySelectorAll("tbody tr");
+
+  filas.forEach(fila=>{
+
+    let texto = fila.innerText.toLowerCase();
+
+    if(texto.includes(filtro)){
+      fila.style.display = "";
+    }else{
+      fila.style.display = "none";
+    }
+
+  });
+
+}
+let grafica;
+
+function crearGrafica(){
+
+  let stockTotal = 0;
+  productos.forEach(p=>{
+    stockTotal += p.stock;
+  });
+
+  let ingresos = 0;
+  let egresos = 0;
+
+  finanzas.forEach(f=>{
+    if(f.detalle === "Venta"){
+  ingresos += f.total;
+}
+
+if(f.detalle === "Compra"){
+  egresos += f.total;
+}
+  });
+
+  const ctx = document.getElementById("miGrafica").getContext("2d");
+
+  if(grafica){
+    grafica.destroy();
+  }
+
+  grafica = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Productos", "Stock", "Ingresos", "Egresos"],
+      datasets: [{
+  label: "Resumen del Sistema",
+  data: [
+    productos.length,
+    stockTotal,
+    ingresos,
+    egresos
+  ],
+  backgroundColor: [
+    "#3498db",
+    "#2ecc71",
+    "#f1c40f",
+    "#e74c3c"
+  ],
+  borderRadius: 10
+}],
+options: {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: false
+    }
+  }
+}
+    }
+  });
+
+}
+function renderTodo(){
+  crearGrafica();
+  tablaProductos.querySelector("tbody").innerHTML =
+  productos.map((p,i)=>`<tr>
+  <td>${p.codigo}</td>
+  <td>${p.nombre}</td>
+  <td>${p.iva ? "Sí" : "No"}</td>
+  <td>${p.stock}</td>
+  <td><button onclick="eliminarProducto(${i})">❌</button></td>
+  </tr>`).join("");
+
+  tablaKardex.querySelector("tbody").innerHTML =
+  kardex.map((k,i)=>`<tr>
+  <td>${k.codigo}</td>
+  <td>${k.tipo}</td>
+  <td>${k.entradaCant||""}</td>
+  <td>${k.entradaVU||""}</td>
+  <td>${k.entradaTotal||""}</td>
+  <td>${k.salidaCant||""}</td>
+  <td>${k.salidaVU||""}</td>
+  <td>${k.salidaTotal||""}</td>
+  <td>${k.saldoCant}</td>
+  <td>${k.saldoVU.toFixed(2)}</td>
+  <td>${k.saldoTotal.toFixed(2)}</td>
+  <td><button onclick="eliminarMovimiento(${i})">🗑</button></td>
+  </tr>`).join("");
+
+  let baseT=0, ivaT=0, totalT=0;
+  let ingHTML="", egrHTML="";
+
+  finanzas.forEach(f=>{
+    baseT+=f.base; ivaT+=f.iva; totalT+=f.total;
+
+    let fila=`<tr>
+    <td>${f.detalle}</td>
+    <td>${f.base.toFixed(2)}</td>
+    <td>${f.iva.toFixed(2)}</td>
+    <td>${f.total.toFixed(2)}</td>
+    </tr>`;
+
+    if(f.tipo==="Ingreso") ingHTML+=fila;
+    else egrHTML+=fila;
+  });
+
+  tablaIngresos.querySelector("tbody").innerHTML = ingHTML;
+  tablaEgresos.querySelector("tbody").innerHTML = egrHTML;
+
+  baseTotal.innerText = baseT.toFixed(2);
+  ivaTotal.innerText = ivaT.toFixed(2);
+  totalGeneral.innerText = totalT.toFixed(2);
+  document.getElementById("totalProductos").innerText = productos.length;
+
+let stockTotal = 0;
+
+productos.forEach(p=>{
+  stockTotal += p.stock;
+});
+
+document.getElementById("totalStock").innerText = stockTotal;
+
+let ingresos = 0;
+let egresos = 0;
+
+finanzas.forEach(f=>{
+
+  if(f.tipo === "Ingreso"){
+    ingresos += f.total;
+  }
+
+  if(f.tipo === "Egreso"){
+    egresos += f.total;
+  }
+
+});
+
+document.getElementById("totalIngresos").innerText = "$" + ingresos.toFixed(2);
+
+document.getElementById("totalEgresos").innerText = "$" + egresos.toFixed(2);
+// 🔥 ESTADÍSTICAS
+}
+
+const tablaProductos=document.getElementById("tablaProductos");
+const tablaKardex=document.getElementById("tablaKardex");
+const tablaIngresos=document.getElementById("tablaIngresos");
+const tablaEgresos=document.getElementById("tablaEgresos");
+
+renderTodo();
+function registrarOperacionSilencioso(k){
+
+  codMov.value = k.codigo;
+  tipoOperacion.value = k.tipo;
+  cantidad.value = k.cantidad;
+  precioInput.value = k.precio;
+
+  registrarOperacion();
+}
+</script>
+
+</body>
+</html>
