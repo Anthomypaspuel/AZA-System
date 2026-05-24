@@ -63,7 +63,6 @@ table{
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(10px);
   border-radius: 15px;
-  overflow: hidden;
   overflow:hidden;
 }
 
@@ -377,7 +376,8 @@ body.dark th{
 }
 
 body.dark td{
-  border:1px solid #555;
+  border-right:1px solid rgba(255,255,255,0.08);
+  border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
 body.dark input,
@@ -472,7 +472,8 @@ tr:hover{
   <a href="#" onclick="mostrarPanel('inicioPanel')">⌂ Inicio</a>
 <a href="#" onclick="mostrarPanel('kardexPanel')">▣ Inventario</a>
 <a href="#" onclick="mostrarPanel('estadisticaPanel')">◔ Estadísticas</a>
-<a href="#" onclick="toggleDarkMode()">☾ Modo Oscuro</a>
+<a href="#" onclick="alternarModoOscuro()">☾ Modo Oscuro</a>
+  <a href="#" onclick="cerrarSesion()">⎋ Cerrar Sesión</a>
 </div>
 
 <!-- PANELES -->
@@ -1311,6 +1312,18 @@ setTimeout(()=>{
 },3000);
 
 console.log("Sistema funcionando correctamente");
+
+  function cerrarSesion(){
+
+  localStorage.removeItem("sesionActiva");
+
+  document.getElementById("sistema").style.display = "none";
+
+  document.getElementById("login").style.display = "block";
+
+  hablar("Sesión cerrada");
+
+}
 </script>
 
 </body>
