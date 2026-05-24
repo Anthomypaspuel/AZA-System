@@ -56,24 +56,28 @@ body.dark{
   color:white;
 }
 table{
-
-  border-collapse:collapse;
-
-  width:100%;
-
-  margin-bottom:20px;
-
-  background:rgba(255,255,255,0.05);
-
-  backdrop-filter:blur(10px);
-
-  border-radius:15px;
-
-  overflow:hidden;
-
+  border-collapse: separate; /* 👈 importante */
+  border-spacing: 0;
+  width: 100%;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  overflow: hidden;
 }
-th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-th { background:#eee; }
+
+th, td{
+  padding: 10px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+}
+
+/* 🔥 FIX PRINCIPAL */
+th{
+  background: rgba(255,255,255,0.08); /* en vez de #eee */
+  color: white;
+}
 input,
 select,
 button{
