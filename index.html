@@ -754,7 +754,7 @@ function eliminarProducto(i){
 
 function registrarOperacion(){
   if(window.recalculando) return;
-  let cod = codMov.value.trim();
+  let cod = codMov.value.trim().toUpperCase();
   let tipo = tipoOperacion.value;
   let cant = parseInt(cantidad.value);
   let precio = parseFloat(precioInput.value);
@@ -766,6 +766,8 @@ let p = productos.find(
 );
   console.log("Código buscado:", cod);
 console.log("Producto encontrado:", p);
+console.log("Productos:", productos);
+  console.log("Código recibido:", cod);
 console.log("Productos:", productos);
   if(!p) return alert("No existe");
 
@@ -927,7 +929,7 @@ try{
   }
 
   // detectar datos
-  let codigoMatch = texto.match(/(cod|codigo)\s*(\w+)/);
+let codigoMatch = texto.match(/(?:cod|codigo)\s+([a-z0-9]+)/i);
 
   let cantidadMatch = texto.match(/cant\w*\s*(\d+)/);
 
@@ -948,8 +950,10 @@ try{
   }
 
   // llenar inputs
-  codMov.value = codigoMatch[2].toUpperCase();
-
+ codMov.value = codigoMatch[1].toUpperCase();
+  
+console.log("Código detectado:", codMov.value);
+  
   tipoOperacion.value = tipo;
 
   cantidad.value = cantidadMatch[1];
@@ -961,12 +965,8 @@ try{
 console.log("Tipo:", tipoOperacion.value);
 console.log("Cantidad:", cantidad.value);
 console.log("Precio:", precioInput.value);
-  registrarOperacion();
-
-  // limpiar
-  codMov.value = "";
-  cantidad.value = "";
-  precioInput.value = "";
+ // solo llenar campos
+hablar("Datos cargados. Presione registrar.");
 
 }catch(error){
   console.log(error);
