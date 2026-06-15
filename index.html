@@ -915,6 +915,13 @@ if(
 }
 
 if(
+  texto.includes("compra") ||
+  texto.includes("comprar") ||
+  texto.includes("compre")
+){
+  tipo = "Compra";
+}
+else if(
   texto.includes("venta") ||
   texto.includes("vender") ||
   texto.includes("vendi") ||
@@ -922,12 +929,14 @@ if(
 ){
   tipo = "Venta";
 }
+else if(texto.includes("devolucion compra")){
+  tipo = "DevCompra";
+}
+else if(texto.includes("devolucion venta")){
+  tipo = "DevVenta";
+}
 
 alert("Texto reconocido: " + texto);
-
-  else if(texto.includes("devolucion compra")){
-    tipo = "DevCompra";
-  }
 
   else if(texto.includes("devolucion venta")){
     tipo = "DevVenta";
