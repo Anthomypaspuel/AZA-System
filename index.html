@@ -729,7 +729,7 @@ function guardar(){
 }
 
 function agregarProducto(){
-  let c = codigo.value.trim();
+ let c = codigo.value.trim().toUpperCase();
   let n = nombre.value.trim();
   let iva = ivaProducto.value == "1";
 
@@ -761,7 +761,9 @@ function registrarOperacion(){
 
   if(!cod || isNaN(cant) || isNaN(precio)) return alert("Error");
 
-  let p = productos.find(x=>x.codigo===cod);
+let p = productos.find(
+  x => x.codigo.trim().toUpperCase() === cod.trim().toUpperCase()
+);
   console.log("Código buscado:", cod);
 console.log("Producto encontrado:", p);
 console.log("Productos:", productos);
