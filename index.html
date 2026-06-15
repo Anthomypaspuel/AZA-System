@@ -762,6 +762,9 @@ function registrarOperacion(){
   if(!cod || isNaN(cant) || isNaN(precio)) return alert("Error");
 
   let p = productos.find(x=>x.codigo===cod);
+  console.log("Código buscado:", cod);
+console.log("Producto encontrado:", p);
+console.log("Productos:", productos);
   if(!p) return alert("No existe");
 
   let entradaCant=0, entradaVU=0, entradaTotal=0;
@@ -812,7 +815,7 @@ else if(tipo === "Venta"){
 }
 
 let saldoVU = p.stock > 0 ? (p.valorTotal / p.stock) : 0;
-
+  console.log("Se va a guardar en kardex");
 kardex.push({
   codigo: cod,
   tipo,
@@ -969,6 +972,10 @@ try{
   precioInput.value = precioMatch[1];
 
   // registrar
+  console.log("Código:", codMov.value);
+console.log("Tipo:", tipoOperacion.value);
+console.log("Cantidad:", cantidad.value);
+console.log("Precio:", precioInput.value);
   registrarOperacion();
 
   // limpiar
