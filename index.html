@@ -853,57 +853,33 @@ function iniciarVoz(){
 
   const reconocimiento = new SpeechRecognition();
 
+  reconocimiento.lang = "es-ES";
+  reconocimiento.continuous = false;
+  reconocimiento.interimResults = true;
+  reconocimiento.maxAlternatives = 1;
 
+  reconocimiento.onresult = function(event){
 
-  reconocimiento.lang = "es-EC";
- reconocimiento.continuous = true;
-reconocimiento.interimResults = false;
-reconocimiento.maxAlternatives = 1;
+    let texto = "";
 
-  reconocimiento.start();
+    for(let i=0; i<event.results.length; i++){
+      texto += event.results[i][0].transcript + " ";
+    }
 
-  reconocimiento.onstart = function(){
-  console.log("Micrófono activado");
-};
-reconocimiento.onresult = function(event){
+    texto = texto.toLowerCase().trim();
 
-  let texto = "";
+    console.log("Escuché:", texto);
 
-  for(let i=0; i<event.results.length; i++){
-    texto += event.results[i][0].transcript + " ";
-  }
-
-  texto = texto.toLowerCase().trim();
-
-  console.log("Escuché:", texto);
-
-  procesarVoz(texto);
-};
+    if(event.results[event.results.length-1].isFinal){
+      procesarVoz(texto);
+    }
+  };
 
   reconocimiento.onerror = function(event){
+    console.log(event.error);
+  };
 
-  console.log("Error:", event.error);
-
-  if(event.error === "network"){
-    console.log("Error de red, reintentando...");
-
-    // 🔥 vuelve a intentar automáticamente
-  setTimeout(()=>{
-  try {
-    reconocimiento.start();
-    reconocimiento.onend = function(){
-  try{
-  }catch(e){}
-};
-  } catch(e) {
-    console.log("Reintento fallido");
-  }
-}, 1500);
-  }else{
-    alert("Error de voz: " + event.error);
-  }
-};
-
+  reconocimiento.start();
 }
 
 // 🔥 PROCESAR VOZ
