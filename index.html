@@ -769,8 +769,14 @@ console.log("Producto encontrado:", p);
 console.log("Productos:", productos);
   console.log("Código recibido:", cod);
 console.log("Productos:", productos);
-  if(!p) return alert("No existe");
-
+if(!p){
+  alert(
+    "No existe\n\nBuscado: " + cod +
+    "\n\nProductos:\n" +
+    productos.map(x => x.codigo).join(", ")
+  );
+  return;
+}
   let entradaCant=0, entradaVU=0, entradaTotal=0;
   let salidaCant=0, salidaVU=0, salidaTotal=0;
 
