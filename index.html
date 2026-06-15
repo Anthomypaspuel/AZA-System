@@ -905,20 +905,25 @@ try{
   let tipo = "";
 
   // detectar tipo
-  if(
-    texto.includes("compra") ||
-    texto.includes("comprar") ||
-    texto.includes("compre")
-  ){
-    tipo = "Compra";
-  }
+// Detectar tipo de operación
+if(
+  texto.includes("compra") ||
+  texto.includes("comprar") ||
+  texto.includes("compre")
+){
+  tipo = "Compra";
+}
 
-  else if(
-    texto.includes("venta") ||
-    texto.includes("vender")
-  ){
-    tipo = "Venta";
-  }
+if(
+  texto.includes("venta") ||
+  texto.includes("vender") ||
+  texto.includes("vendi") ||
+  texto.includes("vendido")
+){
+  tipo = "Venta";
+}
+
+alert("Texto reconocido: " + texto);
 
   else if(texto.includes("devolucion compra")){
     tipo = "DevCompra";
