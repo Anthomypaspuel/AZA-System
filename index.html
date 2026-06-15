@@ -624,7 +624,6 @@ window.onload = function(){
   if(localStorage.getItem("sesionActiva")){
 
     document.getElementById("login").style.display = "none";
-
     document.getElementById("sistema").style.display = "block";
 
     mostrarPanel("inicioPanel");
@@ -632,11 +631,11 @@ window.onload = function(){
   }else{
 
     document.getElementById("login").style.display = "block";
-
     document.getElementById("sistema").style.display = "none";
 
   }
 
+  console.log("LOGIN CARGADO");
 }
 function iniciarSesion(){
 
@@ -906,14 +905,7 @@ try{
 
   // detectar tipo
 // Detectar tipo de operación
-if(
-  texto.includes("compra") ||
-  texto.includes("comprar") ||
-  texto.includes("compre")
-){
-  tipo = "Compra";
-}
-
+// Detectar tipo de operación
 if(
   texto.includes("compra") ||
   texto.includes("comprar") ||
@@ -937,10 +929,6 @@ else if(texto.includes("devolucion venta")){
 }
 
 alert("Texto reconocido: " + texto);
-
-  else if(texto.includes("devolucion venta")){
-    tipo = "DevVenta";
-  }
 
   // validar tipo
   if(tipo === ""){
