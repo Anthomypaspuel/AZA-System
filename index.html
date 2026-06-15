@@ -865,13 +865,17 @@ reconocimiento.maxAlternatives = 1;
   reconocimiento.onstart = function(){
   console.log("Micrófono activado");
 };
-  reconocimiento.onresult = function(event){
+reconocimiento.onresult = function(event){
 
-  let texto = event.results[0][0].transcript.toLowerCase();
+  let texto = "";
+
+  for(let i=0; i<event.results.length; i++){
+    texto += event.results[i][0].transcript + " ";
+  }
+
+  texto = texto.toLowerCase().trim();
 
   console.log("Escuché:", texto);
-
-  alert("Escuché: " + texto);
 
   procesarVoz(texto);
 };
@@ -887,6 +891,10 @@ reconocimiento.maxAlternatives = 1;
   setTimeout(()=>{
   try {
     reconocimiento.start();
+    reconocimiento.onend = function(){
+  try{
+  }catch(e){}
+};
   } catch(e) {
     console.log("Reintento fallido");
   }
