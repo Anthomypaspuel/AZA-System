@@ -935,7 +935,7 @@ try{
   }
 
   // detectar datos
-let codigoMatch = texto.match(/(?:cod|codigo)\s+([a-z0-9]+)/i);
+let codigoMatch = texto.match(/(\d+)/);
 
   let cantidadMatch = texto.match(/cant\w*\s*(\d+)/);
 
@@ -957,6 +957,7 @@ let codigoMatch = texto.match(/(?:cod|codigo)\s+([a-z0-9]+)/i);
 
   // llenar inputs
  codMov.value = codigoMatch[1].toUpperCase();
+  alert("Código detectado: " + codMov.value);
   
 console.log("Código detectado:", codMov.value);
   
