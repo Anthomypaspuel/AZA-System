@@ -856,16 +856,15 @@ function iniciarVoz(){
 
 
   reconocimiento.lang = "es-EC";
-  reconocimiento.continuous = false;
-  reconocimiento.interimResults = false;
+ reconocimiento.continuous = true;
+reconocimiento.interimResults = false;
+reconocimiento.maxAlternatives = 1;
 
   reconocimiento.start();
 
   reconocimiento.onstart = function(){
-    console.log("Micrófono activado");
-    hablar("Te escucho");
-  };
-
+  console.log("Micrófono activado");
+};
   reconocimiento.onresult = function(event){
 
   let texto = event.results[0][0].transcript.toLowerCase();
